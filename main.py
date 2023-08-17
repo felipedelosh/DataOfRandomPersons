@@ -1,145 +1,152 @@
 """
-Felipedelosh 7/5/2020
+FelipedelosH
 
-Genererate a data persons
-
-07 09 2020 > Try to open .txt files
-07 09 2020 > Create Generate person
+Genererate a sample data of people
 """
-
+from PersonModel import Person
 from tkinter import *
+from tkinter import ttk
 import random
-import os
-from datetime import date
+
 
 class Software:
     def __init__(self):
+        #Charge dataset
+        self._lastNames = []
+        self._namesWomen = []
+        self._namesMen = []
+        self._output = [] # Here save a person data
+        self._openSampleData()
         #Views
         self.screen = Tk()
-        self.canvas = Canvas(self.screen, width=640, height=480, bg="snow")
-        self.btnGeneratePerson = Button(self.canvas, text="Generate Person", command=self.generatePerson)
-        #Values
-        self.data = ""
-        self.ID = 0
-        self.firtName = ""
-        self.secondName = ""
-        self.lastName = ""
-        self.sex = 0
-        self.birdDateDD = 0
-        self.birdDateMM = 0
-        self.birdDateYY = 0
-        self.phone = 0
+        self.canvas = Canvas(self.screen, width=640, height=480, bg="black")
+        self.lblMainMessage = Label(self.canvas, bg="black", fg="red", text="To generate a data persons select atributes then the output file and press generate.")
+        self.lblQtyPersons = Label(self.canvas, bg="black", fg="red", text="1 -> Insert number of data to generate:") 
+        self.txtQtyPersons = Entry(self.canvas, bg="black", fg="red", width=10)
+        self.lblSexPersons = Label(self.canvas, bg="black", fg="red", text="2 -> Select a sex to persons:")
+        self._cmbxSex = StringVar()
+        self.cmbxSex = ttk.Combobox(self.canvas, state='readonly', textvariable=self._cmbxSex)
+        self.cmbxSex['values'] = ["MALE", "FEMALE", "RND"]
+        self.cmbxSex.current(0)
+        self.lblOutput = Label(self.canvas, bg="black", fg="red", text="3 -> Select a output type:")
+        self._typeOfOutput = StringVar()
+        self.cmbxtypeOfOutput = ttk.Combobox(self.canvas, state='readonly', textvariable=self._typeOfOutput)
+        self.cmbxtypeOfOutput['values'] = ["SQLScript", "Excel", "Json", ".CSV"]
+        self.cmbxtypeOfOutput.current(0)
+        self.btnGenerateData = Button(self.canvas, bg="green", text="GENERATE", command=self.generateData)
 
-        # Charge dbinfo
-        self.dir = os.path.dirname(os.path.abspath(__file__))
-        self.dbLastName = None
-        self.dbNameMale = None
-        self.dbNameFemale = None
-        self.controlInfoUpload = False
-        self.chargeInfoDB()
-        
-
-        #I want to see the window
+        #show
         self.initView()
 
-    def chargeInfoDB(self):
-        # Try to open fist name of men
-        try:
-            f = open(self.dir+"\data\dbNAMEMALE.txt", 'r', encoding="UTF-8")
-            self.dbNameMale = f.read()
-            self.dbNameMale = self.dbNameMale.strip()
-            self.dbNameMale = self.dbNameMale.split('\n')
-            self.controlInfoUpload = True
-            f.close()
-            f = None
-        except:
-            self.controlInfoUpload = False
-            print('Error in male names')
-
-
-        # Try to open first name of women
-        try:
-            f = open(self.dir+"\data\dbNAMEFEMALE.txt", "r", encoding="UTF-8")
-            self.dbNameFemale = f.read()
-            self.dbNameFemale = self.dbNameFemale.strip()
-            self.dbNameFemale = self.dbNameFemale.split("\n")
-            self.controlInfoUpload = self.controlInfoUpload and True
-            
-            f.close()
-            f = None
-            self.controlInfoUpload = self.controlInfoUpload and True
-        except:
-            self.controlInfoUpload = self.controlInfoUpload and False
-            print('Error in female names')
-
-
-        # Try to open lastnames
-        try:
-            f = open(self.dir+"\\data\\dbLASTNAME.txt", "r", encoding="UTF-8")
-            self.dbLastName = f.read()
-            self.dbLastName = self.dbLastName.strip()
-            self.dbLastName = self.dbLastName.split("\n")
-            f.close()
-            self.controlInfoUpload = self.controlInfoUpload and True
-        except:
-            self.controlInfoUpload = self.controlInfoUpload and False
-            print('Error in last names')
-
-
     def initView(self):
-        self.screen.title("Persons by loko")
-        self.screen.geometry("640x480")
-
+        self.screen.title("Fake data of People Generator")
+        self.screen.geometry("640x300")
         self.canvas.place(x=0, y=0)
 
-        self.btnGeneratePerson.place(x=10, y=20)
+        self.lblMainMessage.place(x=80, y=20)
+        self.canvas.create_line(20, 60, 620, 60, fill="red")
+        self.lblQtyPersons.place(x=40, y=80)
+        self.txtQtyPersons.place(x=250, y=80)
+        self.lblSexPersons.place(x=60, y=120)
+        self.cmbxSex.place(x=220, y=120)
+        self.lblOutput.place(x=70, y=160)
+        self.cmbxtypeOfOutput.place(x=220, y=160)
+
+        self.btnGenerateData.place(x=260, y=250)
+
 
         self.screen.mainloop()
 
-    """
-    Person : 
-    ID
-    Last names
-    Firt name
-    Second name
-    sex
-    birth date
-    Tel
-    """
-    def generatePerson(self):
-        # sex
-        self.sex = random.randint(0,1)
 
-        # Age
-        age = random.randint(0, 100)
-        today = str(date.today())
+    def generateData(self):
+        if self._validatesQty():
+            self._output = [] # Reset
+            # Generate data
+            for i in range(1, int(self.txtQtyPersons.get())+1):
+                if self._cmbxSex.get() == "RND":
+                    _k = random.randint(0, 1)
+                    if _k == 0:
+                        self._generateMan()
+                    else:
+                        self._generateWoman()
+                else:
+                    if self._cmbxSex.get() == "MALE":
+                        self._generateMan()
 
-        self.birdDateMM = random.randint(1, 12)
-
-        # Days if feb
-        # Some people programe MM ends to 30 and 31
-        # No time for it
-        if self.birdDateMM == 2:
-            self.birdDateDD = random.randint(1, 28)
+                    if self._cmbxSex.get() == "FEMALE":
+                        self._generateWoman()
+            # Save data
+            self._saveData()
         else:
-            self.birdDateDD = random.randint(1, 30)
-
-        # Year
-        # i need to cacth year and YY - age to put in birth date
-
-        print(self.birdDateDD, self.birdDateMM)
+            self._outputWindow("Error", "Insert Valid Number")
 
 
 
+    def _generateMan(self):
+        """
+
+        """
+        id = len(self._output) + 1
+        _name = self._namesMen[random.randint(0, len(self._namesMen)-1)]
+        _lastname = self._lastNames[random.randint(0, len(self._lastNames)-1)] + " " + self._lastNames[random.randint(0, len(self._lastNames)-1)]
+        _p = Person(id, "M", _name, _lastname)
+        self._output.append(_p)
 
 
-        # Generate last names
-        # Somepersons hast 1 last name
-        if(random.randint(0,9)<2):
-            self.lastName = str(self.dbLastName[random.randint(0,len(self.dbLastName)-1)])
-        else:
-            self.lastName = str(self.dbLastName[random.randint(0,len(self.dbLastName)-1)]) + " " + str(self.dbLastName[random.randint(0,len(self.dbLastName)-1)])
+    def _generateWoman(self):
+        """
+        
+        """
+        id = len(self._output) + 1
+        _name = self._namesWomen[random.randint(0, len(self._namesWomen)-1)]
+        _lastname = self._lastNames[random.randint(0, len(self._lastNames)-1)] + " " + self._lastNames[random.randint(0, len(self._lastNames)-1)]
 
+        _p = Person(id, "F", _name, _lastname)
+        self._output.append(_p)
+
+
+    def _validatesQty(self):
+        try:
+            return int(self.txtQtyPersons.get()) > 0
+        except:
+            return False
+        
+
+    def _openSampleData(self):
+        try:
+            with open("dataset\dbLASTNAME.txt", "r", encoding="UTF-8") as f:
+                for i in f.read().split("\n"):
+                    self._lastNames.append(i)
+
+            with open("dataset\dbNAMEFEMALE.txt", "r", encoding="UTF-8") as f:
+                for i in f.read().split("\n"):
+                    self._namesWomen.append(i)
+
+
+            with open("dataset\dbNAMEMALE.txt", "r", encoding="UTF-8") as f:
+                for i in f.read().split("\n"):
+                    self._namesMen.append(i)
+
+        except:
+            self._outputWindow("Error", "NOT FIND SAMPLE DATA")
+
+    def _saveData(self):
+        _filedata = ""
+        for i in self._output:
+            print(i)
+
+
+    def _outputWindow(self, title, text):
+        top = Toplevel()
+        top.title(title)
+        top.geometry("500x300")
+        canvas = Canvas(top, height=300, width=500, bg="black")
+        canvas.place(x=0, y=0)
+        msg = Text(canvas, width=55, height=13, bg="black", fg="red")
+        msg.insert(END, text)
+        msg.place(x=25, y=20)
+        button = Button(canvas, text="Aceptar", bg="green", command=top.destroy)
+        button.place(x=222, y=260)
 
 
 #Launch
