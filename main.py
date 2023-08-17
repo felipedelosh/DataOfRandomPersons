@@ -6,6 +6,8 @@ Genererate a sample data of people
 from PersonModel import Person
 from tkinter import *
 from tkinter import ttk
+from datetime import date
+from datetime import datetime
 import random
 
 
@@ -89,7 +91,8 @@ class Software:
         id = len(self._output) + 1
         _name = self._namesMen[random.randint(0, len(self._namesMen)-1)]
         _lastname = self._lastNames[random.randint(0, len(self._lastNames)-1)] + " " + self._lastNames[random.randint(0, len(self._lastNames)-1)]
-        _p = Person(id, "M", _name, _lastname)
+        
+        _p = Person(id, "M", _name, _lastname, self._getBirthDate())
         self._output.append(_p)
 
 
@@ -101,8 +104,54 @@ class Software:
         _name = self._namesWomen[random.randint(0, len(self._namesWomen)-1)]
         _lastname = self._lastNames[random.randint(0, len(self._lastNames)-1)] + " " + self._lastNames[random.randint(0, len(self._lastNames)-1)]
 
-        _p = Person(id, "F", _name, _lastname)
+        _p = Person(id, "F", _name, _lastname, self._getBirthDate())
         self._output.append(_p)
+
+
+    def _getBirthDate(self):
+        """
+        Return a rnd date in str: YYYY-MM-DD
+        """
+        _now = date.today()
+        _now = str(_now).split("-")
+        _YYYY = int(_now[0])
+        _MM = int(_now[1])
+        _DD = int(_now[2])
+        _age = random.randint(0, 99)
+        _age = 0
+        _person_birth_YYYY_date = 0
+        _person_birth_MM_date = 0
+        _person_birth_DD_date = 0
+
+        if _age == 0:
+            _person_birth_YYYY_date = _YYYY
+            if _MM == 1:
+                _person_birth_MM_date = 1
+                if _DD == 1:
+                    _person_birth_DD_date = 1
+                else:
+                    _person_birth_DD_date = 0
+            else:
+                _person_birth_MM_date = random.randint(1, _MM-1)
+                if _person_birth_MM_date == 2:
+                    _person_birth_DD_date = random.randint(1, 29)
+                elif _person_birth_MM_date == 4 or _person_birth_MM_date == 6 or _person_birth_MM_date == 9 or _person_birth_MM_date == 11:
+                    _person_birth_DD_date = random.randint(1, 31)
+                else:
+                    _person_birth_DD_date = random.randint(1, 32)
+        else:
+            _person_birth_YYYY_date = _YYYY - _age # Get year
+            _person_birth_MM_date = random.randint(1, 13)
+            if _person_birth_MM_date == 2:
+                _person_birth_DD_date = random.randint(1, 29)
+            elif _person_birth_MM_date == 4 or _person_birth_MM_date == 6 or _person_birth_MM_date == 9 or _person_birth_MM_date == 11:
+                _person_birth_DD_date = random.randint(1, 31)
+            else:
+                _person_birth_DD_date = random.randint(1, 32)
+
+        _pBirthDate = f"{_person_birth_YYYY_date}-{_person_birth_MM_date}-{_person_birth_DD_date}"
+
+        return _pBirthDate
 
 
     def _validatesQty(self):
@@ -131,9 +180,25 @@ class Software:
             self._outputWindow("Error", "NOT FIND SAMPLE DATA")
 
     def _saveData(self):
+        if self._typeOfOutput.get() == "SQLScript":
+            self._saveSQL()
+        
+        if self._typeOfOutput == "Excel":
+            pass
+
+        if self._typeOfOutput == "Json":
+            pass
+
+        if self._typeOfOutput == ".CSV":
+            pass
+
+    def _saveSQL(self):
         _filedata = ""
         for i in self._output:
-            print(i)
+            _filedata = _filedata + i.getSQLInsert() + "\n"
+
+        with open("output\sql.sql", "w", encoding="UTF-8") as f:
+            f.write(_filedata)
 
 
     def _outputWindow(self, title, text):
