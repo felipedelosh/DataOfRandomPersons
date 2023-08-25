@@ -3,13 +3,13 @@
 <h4>FAKE Data of PEOPLE v1.0</h4>
 
 ![Banner](Docs/banner.png)
+<br>
 :construction: IN CONSTRUCTION :construction:
 <br><br>
 read a .txt input files with person info, and randomized output.
 This aplication generate a data from persons: ID, sex, names, lastnames, YYYY-MM-DD
 
 ## :hammer:Funcionalidades del proyecto
-"SQLScript", "Excel", "Json", ".CSV"
 - `Function 1`: Export information to sql insert query.<br>
 - `Function 2`: Export information to xlsx.<br>
 - `Function 3`: Export information to Json formated.<br>
