@@ -182,15 +182,12 @@ class Software:
     def _saveData(self):
         if self._typeOfOutput.get() == "SQLScript":
             self._saveSQL()
-        
-        if self._typeOfOutput == "Excel":
-            pass
-
-        if self._typeOfOutput == "Json":
-            pass
-
-        if self._typeOfOutput == ".CSV":
-            pass
+        elif self._typeOfOutput.get() == "Excel":
+            self._saveEXCEL()
+        elif self._typeOfOutput.get() == "Json":
+            self._saveJSON()
+        elif self._typeOfOutput.get() == ".CSV":
+            self._saveCSV()
 
     def _saveSQL(self):
         _filedata = ""
@@ -199,6 +196,37 @@ class Software:
 
         with open("output\sql.sql", "w", encoding="UTF-8") as f:
             f.write(_filedata)
+
+    def _saveEXCEL(self):
+        _filedata = ""
+        for i in self._output:
+            _filedata = _filedata + i.getCSVdelimitatesToPipeline() + "\n"
+
+        with open("output\excel.xlsx", "w", encoding="UTF-8") as f:
+            f.write(_filedata)  
+
+    def _saveJSON(self):
+        _filedata = ""
+        output = ""
+        for i in self._output:
+            _filedata = _filedata + i.getJson() + ","
+
+        # erase last comma
+        _filedata = _filedata[:-1]
+
+        _metadata = "\"metadata\": " + "{\n\t\"version\":\"1.0\",\n\t\"timestamp\":\"" + str(date.today()) + "\",\n\t\"author\":\"felipedelosh\",\n\t\"length\":" + str(len(self._output)) +  "\n}"
+        output = "{\n" + "\"data\":[" + _filedata + "],\n" + _metadata +"\n}"
+
+        with open("output\json.json", "w", encoding="UTF-8") as f:
+            f.write(output)  
+
+    def _saveCSV(self):
+        _filedata = ""
+        for i in self._output:
+            _filedata = _filedata + i.getCSVdelimitatesToComma() + "\n"
+
+        with open("output\csv.csv", "w", encoding="UTF-8") as f:
+            f.write(_filedata)  
 
 
     def _outputWindow(self, title, text):
